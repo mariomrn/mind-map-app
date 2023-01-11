@@ -39,15 +39,15 @@ class _MyAppState extends State<MyApp> {
             items: [
               BottomNavigationBarItem(
                 icon: Icon(Icons.home),
-                title: Text('Home'),
+                label: 'Home',
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.search),
-                title: Text('Search'),
+                label: 'Search',
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.account_circle_rounded),
-                title: Text('User'),
+                label: 'User',
               )
             ],
             onTap: (index) => {

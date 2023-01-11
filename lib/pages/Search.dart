@@ -21,11 +21,10 @@ class _TreeViewPageState extends State<TreeViewPage> {
   }
 
   void addEdge(from, to) {
-    graph.addEdge(Node.Id(from), Node.Id(to));
+    _graph.addEdge(Node.Id(from), Node.Id(to));
   }
 
   void resetZoom() {
-    //print(Node.Id(selectedNode.value));
     controller.value = Matrix4.identity();
   }
 
@@ -70,31 +69,55 @@ class _TreeViewPageState extends State<TreeViewPage> {
         json['edges'].removeWhere(
             (node) => node['from'] == element || node['to'] == element);
       });
-      graph.removeNode(Node.Id(nodeIdArray[0]));
+      _graph.removeNode(Node.Id(nodeIdArray[0]));
     });
     print(json);
   }
 
   setSelectedNode(newNodeId) {
     selectedNode.value = newNodeId;
+    print('print(selectedNode.value);');
     print(selectedNode.value);
   }
 
   initializeGraph() {
     json = {
       "nodes": [
-        {"id": 1, "label": 'Início'}
-      ],
-      "edges": []
-    };
-    var nodes = json['nodes']!;
-    graph.addNode(Node.Id(1));
+        {"id": 101, "label": 'Início'},
+        {"id": 201, "label": 'NEW NODE'},
+        {"id": 301, "label": 'NEW NODE'},
+        {"id": 302, "label": 'NEW NODE'},
+        {"id": 202, "label": 'NEW NODE'},
+        {"id": 203, "label": 'NEW NODE'},
+        {"id": 102, "label": 'NEW NODE'},
 
-    builder
-      ..siblingSeparation = (20)
-      ..levelSeparation = (100)
-      ..subtreeSeparation = (50)
-      ..orientation = (BuchheimWalkerConfiguration.ORIENTATION_LEFT_RIGHT);
+      ],
+      "edges": [
+      ]
+    };
+
+    print(json['nodes']);
+    Node node101 = Node.Id(101);
+    Node node102 = Node.Id(102);
+    Node node201 = Node.Id(201);
+    Node node202 = Node.Id(202);
+    Node node203 = Node.Id(203);
+    Node node301 = Node.Id(301);
+    Node node302 = Node.Id(302);
+    _graph.addNode(node101);
+    _graph.addNode(node102);
+    _graph.addNode(node201);
+    _graph.addNode(node202);
+    _graph.addNode(node203);
+    _graph.addNode(node301);
+    _graph.addNode(node302);
+    _graph.addEdge(node101, node202);
+    _graph.addEdge(node101, node203);
+    _graph.addEdge(node102, node201);
+    _graph.addEdge(node102, node203);
+    _graph.addEdge(node203, node301);
+    _graph.addEdge(node202, node302);
+    _graph.addEdge(node203, node302);
   }
 
   updateGraph(newJson) {
@@ -105,7 +128,7 @@ class _TreeViewPageState extends State<TreeViewPage> {
     edges.forEach((element) {
       var fromNodeId = element['from'];
       var toNodeId = element['to'];
-      graph.addEdge(Node.Id(fromNodeId), Node.Id(toNodeId));
+      _graph.addEdge(Node.Id(fromNodeId), Node.Id(toNodeId));
     });
 
     print('json modificado');
@@ -117,55 +140,6 @@ class _TreeViewPageState extends State<TreeViewPage> {
       body: Column(
         mainAxisSize: MainAxisSize.max,
         children: [
-          /*   Wrap(
-            children: [
-              Container(
-                width: 100,
-                child: TextFormField(
-                  initialValue: builder.siblingSeparation.toString(),
-                  decoration: InputDecoration(labelText: "Sibling Separation"),
-                  onChanged: (text) {
-                    builder.siblingSeparation = int.tryParse(text) ?? 100;
-                    this.setState(() {});
-                  },
-                ),
-              ),
-              Container(
-                width: 100,
-                child: TextFormField(
-                  initialValue: builder.levelSeparation.toString(),
-                  decoration: InputDecoration(labelText: "Level Separation"),
-                  onChanged: (text) {
-                    builder.levelSeparation = int.tryParse(text) ?? 100;
-                    this.setState(() {});
-                  },
-                ),
-              ),
-              Container(
-                width: 100,
-                child: TextFormField(
-                  initialValue: builder.subtreeSeparation.toString(),
-                  decoration: InputDecoration(labelText: "Subtree separation"),
-                  onChanged: (text) {
-                    builder.subtreeSeparation = int.tryParse(text) ?? 100;
-                    this.setState(() {});
-                  },
-                ),
-              ),
-              Container(
-                width: 100,
-                child: TextFormField(
-                  initialValue: builder.orientation.toString(),
-                  decoration: InputDecoration(labelText: "Orientation"),
-                  onChanged: (text) {
-                    builder.orientation = int.tryParse(text) ?? 100;
-                    this.setState(() {});
-                  },
-                ),
-              ),
-            ],
-          ),
-    */
           Expanded(
             child: InteractiveViewer(
               transformationController: controller,
@@ -174,9 +148,8 @@ class _TreeViewPageState extends State<TreeViewPage> {
               minScale: 0.01,
               maxScale: 2,
               child: GraphView(
-                graph: graph,
-                algorithm:
-                    BuchheimWalkerAlgorithm(builder, TreeEdgeRenderer(builder)),
+                graph: _graph,
+                algorithm: SugiyamaAlgorithm(_configuration),
                 paint: Paint()
                   ..color = Colors.greenAccent
                   ..strokeWidth = 3
@@ -218,8 +191,12 @@ class _TreeViewPageState extends State<TreeViewPage> {
         createBro, controller);
   }
 
-  Graph graph = Graph()..isTree = true;
-  BuchheimWalkerConfiguration builder = BuchheimWalkerConfiguration();
+  Graph _graph = Graph()..isTree = true;
+  final _configuration = SugiyamaConfiguration()
+    ..orientation = 1
+    ..nodeSeparation = 40
+    ..levelSeparation = 50
+    ..orientation = SugiyamaConfiguration.ORIENTATION_LEFT_RIGHT;
 
   @override
   void initState() {

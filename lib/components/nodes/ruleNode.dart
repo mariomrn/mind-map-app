@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 
-class StartingNode extends StatelessWidget {
-  bool isSelected;
+class RuleNode extends StatelessWidget {
+  bool isActive = false;
+  bool isMaximized = false;
   ValueNotifier<int?> selectedNode;
   Function setSelectedNode;
   int? nodeId;
   var myFocusNode;
 
-  StartingNode(this.isSelected, this.selectedNode, this.setSelectedNode,
+  RuleNode(this.isActive, this.isMaximized, this.selectedNode, this.setSelectedNode,
       this.nodeId, this.myFocusNode);
 
   @override
@@ -16,11 +17,8 @@ class StartingNode extends StatelessWidget {
       padding: EdgeInsets.all(50),
       width: 350,
       decoration: BoxDecoration(
-          color: Colors.red,
+          color: Colors.red.shade800,
           borderRadius: BorderRadius.circular(10),
-          border: isSelected
-              ? Border.all(width: 3, color: Colors.amber)
-              : Border.all(width: 2, color: Colors.red.shade900),
           boxShadow: [
             BoxShadow(
               color: Colors.grey.withAlpha(60),
@@ -48,20 +46,7 @@ class StartingNode extends StatelessWidget {
           ),
           Expanded(
             flex: 5,
-            child: TextFormField(
-                onChanged: null,
-                focusNode: myFocusNode,
-                onTap: () {
-                  setSelectedNode(nodeId);
-                },
-                maxLines: null,
-                decoration: InputDecoration(
-                  focusColor: Colors.amber,
-                  contentPadding: EdgeInsets.all(0),
-                  hintText: 'Mensagem de boas-vindas',
-                  border: InputBorder.none,
-                ),
-                style: TextStyle(fontWeight: FontWeight.bold)),
+            child: isMaximized ? Text('Mensagem de boas-vindas') : Text('min')
           ),
         ],
       ),

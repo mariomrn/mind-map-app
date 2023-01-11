@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
-import 'StartingNode.dart';
-import 'CommonNode.dart';
+import 'nodes/ruleNode.dart';
+import 'nodes/defNode.dart';
+import 'nodes/tableNode.dart';
 import 'NodeOptions.dart';
 
 class Nodulo extends StatefulWidget {
@@ -22,8 +23,9 @@ class Nodulo extends StatefulWidget {
 }
 
 class _NoduloState extends State<Nodulo> {
+  bool isActive = false;
+  bool isMaximized = false;
   var isSelected = false;
-  bool isFirst = false;
   late FocusNode myFocusNode = new FocusNode();
 
   void handleFocus(value) {
@@ -48,28 +50,29 @@ class _NoduloState extends State<Nodulo> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        setSelectedNode(nodeId);
-      },
-      onLongPress: () {
-        setSelectedNode(nodeId);
+        setState(() {
+          isMaximized ? isMaximized = false : isMaximized = true;
+        });
       },
       child: ValueListenableBuilder(
         valueListenable: selectedNode,
         builder: (context, value, child) {
           handleFocus(value);
           return Row(children: [
-            isFirst
-                ? StartingNode(isSelected, selectedNode, setSelectedNode,
-                    nodeId, myFocusNode)
-                : CommonNode(isSelected, selectedNode, setSelectedNode, nodeId,
-                    myFocusNode),
-            isSelected
-                ? isFirst
-                    ? NodeOptions(createSon, createBro, true)
-                    : NodeOptions(createSon, createBro, false)
+            if (widget.nodeId! < 200)
+                RuleNode(isActive, isMaximized, selectedNode, setSelectedNode,
+                nodeId, myFocusNode),
+          if (widget.nodeId! < 300 && widget.nodeId! > 199)
+            DefNode(isSelected, selectedNode, setSelectedNode,
+                nodeId, myFocusNode),
+          if (widget.nodeId! > 300 )
+            TableNode(isSelected, selectedNode, setSelectedNode,
+                nodeId, myFocusNode),
+            isSelected?
+            NodeOptions(createSon, createBro, false)
                 : Column(),
           ]);
-          ;
+
         },
       ),
     );
@@ -78,9 +81,6 @@ class _NoduloState extends State<Nodulo> {
   @override
   void initState() {
     super.initState();
-    if (this.nodeId == 1) {
-      isFirst = true;
-    }
     setSelectedNode(nodeId);
     myFocusNode.requestFocus();
     //controller.value = Matrix4.identity();
