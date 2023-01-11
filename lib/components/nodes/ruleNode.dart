@@ -15,7 +15,7 @@ class RuleNode extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(50),
-      width: 350,
+      width: isMaximized ? 300 :450,
       decoration: BoxDecoration(
           color: Colors.red.shade800,
           borderRadius: BorderRadius.circular(10),
