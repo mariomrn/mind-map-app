@@ -1,5 +1,4 @@
 // ignore_for_file: file_names, avoid_print
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:graphview/GraphView.dart';
@@ -18,7 +17,7 @@ class _TreeViewPageState extends State<TreeViewPage> {
 
   addNode(String label) {
     int newId = nodeList["nodes"].length + 1;
-    nodeList['nodes'].add({"id": newId, "label": label});
+    nodeList['nodes'].add({"id": newId, "label": label, "children": ['A', 'B']});
     return newId;
   }
 
@@ -62,7 +61,7 @@ class _TreeViewPageState extends State<TreeViewPage> {
 
   void deleteNode() {
     var edges = nodeList['edges'];
-    var nodes = nodeList['nodes'];
+    // var nodes = nodeList['nodes'];
     //Inicializa array com o valor do node selecionado
     var nodeIdArray = [selectedNode.value];
     //Passa por todas as edges
