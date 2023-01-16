@@ -49,11 +49,22 @@ class _NoduloState extends State<Nodulo> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
+
       onTap: () {
         setState(() {
-          isMaximized ? isMaximized = false : isMaximized = true;
+          if(isActive) {
+            // if node is active switch between max and min option
+            isMaximized ? isMaximized = false : isMaximized = true;
+          } else {
+            // if node is not active -> activate node
+            isActive = true;
+            // TODO: add all dependent nodes to the net
+            //neue Söhne
+            createSon();
+          }
         });
       },
+
       child: ValueListenableBuilder(
         valueListenable: selectedNode,
         builder: (context, value, child) {

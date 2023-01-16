@@ -8,14 +8,14 @@ class RuleNode extends StatelessWidget {
   int? nodeId;
   var myFocusNode;
 
-  RuleNode(this.isActive, this.isMaximized, this.selectedNode, this.setSelectedNode,
-      this.nodeId, this.myFocusNode);
+  RuleNode(this.isActive, this.isMaximized, this.selectedNode,
+      this.setSelectedNode, this.nodeId, this.myFocusNode);
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(50),
-      width: isMaximized ? 300 :450,
+      width: isMaximized ? 300 : 450,
       decoration: BoxDecoration(
           color: Colors.red.shade800,
           borderRadius: BorderRadius.circular(10),
@@ -44,10 +44,13 @@ class RuleNode extends StatelessWidget {
               ),
             ),
           ),
-          Expanded(
-            flex: 5,
-            child: isMaximized ? Text('Mensagem de boas-vindas') : Text('min')
-          ),
+          isActive
+              ? Expanded(
+                  flex: 5,
+                  child: isMaximized
+                      ? Text('Mensagem de boas-vindas')
+                      : Text('min'))
+              : const Expanded(flex: 5, child: Text('Not active')),
         ],
       ),
     );
