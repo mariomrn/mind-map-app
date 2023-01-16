@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'nodes/ruleNode.dart';
 import 'nodes/defNode.dart';
 import 'nodes/tableNode.dart';
-import 'NodeOptions.dart';
 
 class Nodulo extends StatefulWidget {
   String? title;
@@ -11,15 +10,14 @@ class Nodulo extends StatefulWidget {
   ValueNotifier<int> selectedNode;
   final Function setSelectedNode;
   final createSon;
-  final createBro;
   final controller;
 
   Nodulo(this.nodeId, this.title, this.selectedNode, this.setSelectedNode,
-      this.createSon, this.createBro, this.controller);
+      this.createSon, this.controller);
 
   @override
   State<Nodulo> createState() => _NoduloState(nodeId, title, selectedNode,
-      setSelectedNode, createSon, createBro, controller);
+      setSelectedNode, createSon, controller);
 }
 
 class _NoduloState extends State<Nodulo> {
@@ -41,10 +39,9 @@ class _NoduloState extends State<Nodulo> {
   ValueNotifier<int> selectedNode;
   final Function setSelectedNode;
   final createSon;
-  final createBro;
   final controller;
   _NoduloState(this.nodeId, this.title, this.selectedNode, this.setSelectedNode,
-      this.createSon, this.createBro, this.controller);
+      this.createSon, this.controller);
 
   @override
   Widget build(BuildContext context) {

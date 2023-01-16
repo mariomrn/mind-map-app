@@ -15,12 +15,6 @@ class _TreeViewPageState extends State<TreeViewPage> {
   var selectedNode = ValueNotifier<int>(0);
   final controller = TransformationController();
 
-  addNode(String label) {
-    int newId = nodeList["nodes"].length + 1;
-    nodeList['nodes'].add({"id": newId, "label": label, "children": ['A', 'B']});
-    return newId;
-  }
-
   void addEdge(from, to) {
     _graph.addEdge(Node.Id(from), Node.Id(to));
   }
@@ -29,35 +23,51 @@ class _TreeViewPageState extends State<TreeViewPage> {
     controller.value = Matrix4.identity();
   }
 
-  void createSon(int nodeID) {
+  addNode(String label, int type) {
+    int newId = nodeList["nodes"].length + 1 + type;
+    nodeList['nodes'].add({"id": newId, "label": label, "children": ['A', 'B'], "parents": ['A', 'B']});
+    return newId;
+  }
+
+  void createFam(int nodeID) {
     var nodes = nodeList['nodes']!;
     nodes.forEach((node) {
       if(node['id'] == nodeID){
-        var children = node['children']!;
-        children.forEach((child){
-          //create a node + edge:
-          //add edge to list
+        List<dynamic> children = node['children']!;
+        if(children.isNotEmpty && nodeID < 299) {
+          for (var child in children) {
+            int newId = addNode(child, (nodeID~/100)*100+100);
+            setState(() {});
+            nodeList['edges'].add({"from": nodeID, "to": newId});
+            addEdge(nodeID, newId);
+            print(child);
+          }
+        }
 
-          int newId = addNode(child);
-          setState(() {});
-          nodeList['edges'].add({"from": nodeID, "to": newId});
-          addEdge(nodeID, newId);
-          print(child);
-        });
+        List<dynamic> parents = node['parents']!;
+        if(parents.isNotEmpty && nodeID > 199) {
+          for (var parent in parents) {
+            int newId = addNode(parent, (nodeID~/100)*100-100);
+            setState(() {});
+            nodeList['edges'].add({"from": newId, "to": nodeID});
+            addEdge(newId, nodeID);
+            print(parent);
+          }
+        }
       };
     });
   }
 
-  void createBro() {
-    int newId = addNode('label');
-    var previousNode = nodeList['edges']
-        .firstWhere((element) => element["to"] == selectedNode.value);
-    int previousConnection = previousNode['from'];
-    //roda até a linha acima
-    nodeList['edges']!.add({"from": previousConnection, "to": newId}) as Map?;
-    setState(() {});
-    addEdge(previousConnection, newId);
-  }
+  // void createBro() {
+  //   int newId = addNode('label');
+  //   var previousNode = nodeList['edges']
+  //       .firstWhere((element) => element["to"] == selectedNode.value);
+  //   int previousConnection = previousNode['from'];
+  //   //roda até a linha acima
+  //   nodeList['edges']!.add({"from": previousConnection, "to": newId}) as Map?;
+  //   setState(() {});
+  //   addEdge(previousConnection, newId);
+  // }
 
   void deleteNode() {
     var edges = nodeList['edges'];
@@ -99,7 +109,8 @@ class _TreeViewPageState extends State<TreeViewPage> {
         {
           "id": 101,
           "label": "inicio",
-          "children": ["A", "B", "C"]
+          "children": ["A", "B", "C"],
+          "parents": []
         },
       ],
       "edges": []
@@ -196,8 +207,7 @@ class _TreeViewPageState extends State<TreeViewPage> {
   }
 
   Widget rectangleWidget(int? id, String? title) {
-    return Nodulo(id, title, selectedNode, setSelectedNode, createSon,
-        createBro, controller);
+    return Nodulo(id, title, selectedNode, setSelectedNode, createFam, controller);
   }
 
   Graph _graph = Graph()..isTree = true;
