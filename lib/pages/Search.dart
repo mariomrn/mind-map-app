@@ -1,4 +1,6 @@
 // ignore_for_file: file_names, avoid_print
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:graphview/GraphView.dart';
 
@@ -10,13 +12,13 @@ class TreeViewPage extends StatefulWidget {
 }
 
 class _TreeViewPageState extends State<TreeViewPage> {
-  var json;
+  var nodeList;
   var selectedNode = ValueNotifier<int>(0);
   final controller = TransformationController();
 
-  addNode() {
-    int newId = json["nodes"].length + 1;
-    json['nodes'].add({"id": newId, "label": 'NEW NODE'});
+  addNode(String label) {
+    int newId = nodeList["nodes"].length + 1;
+    nodeList['nodes'].add({"id": newId, "label": label});
     return newId;
   }
 
@@ -28,27 +30,39 @@ class _TreeViewPageState extends State<TreeViewPage> {
     controller.value = Matrix4.identity();
   }
 
-  void createSon() {
-    int newId = addNode();
-    setState(() {});
-    json['edges'].add({"from": selectedNode.value, "to": newId});
-    addEdge(selectedNode.value, newId);
+  void createSon(int nodeID) {
+    var nodes = nodeList['nodes']!;
+    nodes.forEach((node) {
+      if(node['id'] == nodeID){
+        var children = node['children']!;
+        children.forEach((child){
+          //create a node + edge:
+          //add edge to list
+
+          int newId = addNode(child);
+          setState(() {});
+          nodeList['edges'].add({"from": nodeID, "to": newId});
+          addEdge(nodeID, newId);
+          print(child);
+        });
+      };
+    });
   }
 
   void createBro() {
-    int newId = addNode();
-    var previousNode = json['edges']
+    int newId = addNode('label');
+    var previousNode = nodeList['edges']
         .firstWhere((element) => element["to"] == selectedNode.value);
     int previousConnection = previousNode['from'];
     //roda até a linha acima
-    json['edges']!.add({"from": previousConnection, "to": newId}) as Map?;
+    nodeList['edges']!.add({"from": previousConnection, "to": newId}) as Map?;
     setState(() {});
     addEdge(previousConnection, newId);
   }
 
   void deleteNode() {
-    var edges = json['edges'];
-    var nodes = json['nodes'];
+    var edges = nodeList['edges'];
+    var nodes = nodeList['nodes'];
     //Inicializa array com o valor do node selecionado
     var nodeIdArray = [selectedNode.value];
     //Passa por todas as edges
@@ -65,13 +79,13 @@ class _TreeViewPageState extends State<TreeViewPage> {
 
     setState(() {
       nodeIdArray.forEach((element) {
-        json['nodes'].removeWhere((node) => node['id'] == element);
-        json['edges'].removeWhere(
+        nodeList['nodes'].removeWhere((node) => node['id'] == element);
+        nodeList['edges'].removeWhere(
             (node) => node['from'] == element || node['to'] == element);
       });
       _graph.removeNode(Node.Id(nodeIdArray[0]));
     });
-    print(json);
+    print(nodeList);
   }
 
   setSelectedNode(newNodeId) {
@@ -81,50 +95,46 @@ class _TreeViewPageState extends State<TreeViewPage> {
   }
 
   initializeGraph() {
-    json = {
+    nodeList = {
       "nodes": [
-        {"id": 101, "label": 'Início'},
-        {"id": 201, "label": 'NEW NODE'},
-        {"id": 301, "label": 'NEW NODE'},
-        {"id": 302, "label": 'NEW NODE'},
-        {"id": 202, "label": 'NEW NODE'},
-        {"id": 203, "label": 'NEW NODE'},
-        {"id": 102, "label": 'NEW NODE'},
-
+        {
+          "id": 101,
+          "label": "inicio",
+          "children": ["A", "B", "C"]
+        },
       ],
-      "edges": [
-      ]
+      "edges": []
     };
 
-    print(json['nodes']);
+    print(nodeList['nodes']);
     Node node101 = Node.Id(101);
-    Node node102 = Node.Id(102);
-    Node node201 = Node.Id(201);
-    Node node202 = Node.Id(202);
-    Node node203 = Node.Id(203);
-    Node node301 = Node.Id(301);
-    Node node302 = Node.Id(302);
+    //Node node102 = Node.Id(102);
+    //Node node201 = Node.Id(201);
+    //Node node202 = Node.Id(202);
+    //Node node203 = Node.Id(203);
+    //Node node301 = Node.Id(301);
+    //Node node302 = Node.Id(302);
     _graph.addNode(node101);
-    _graph.addNode(node102);
-    _graph.addNode(node201);
-    _graph.addNode(node202);
-    _graph.addNode(node203);
-    _graph.addNode(node301);
-    _graph.addNode(node302);
-    _graph.addEdge(node101, node202);
-    _graph.addEdge(node101, node203);
-    _graph.addEdge(node102, node201);
-    _graph.addEdge(node102, node203);
-    _graph.addEdge(node203, node301);
-    _graph.addEdge(node202, node302);
-    _graph.addEdge(node203, node302);
+    //_graph.addNode(node102);
+    //_graph.addNode(node201);
+    //_graph.addNode(node202);
+    //_graph.addNode(node203);
+    //_graph.addNode(node301);
+    //_graph.addNode(node302);
+    //_graph.addEdge(node101, node202);
+    //_graph.addEdge(node101, node203);
+    //_graph.addEdge(node102, node201);
+    //_graph.addEdge(node102, node203);
+    //_graph.addEdge(node203, node301);
+    //_graph.addEdge(node202, node302);
+    //_graph.addEdge(node203, node302);
   }
 
   updateGraph(newJson) {
     setState(() {
-      json = newJson;
+      nodeList = newJson;
     });
-    var edges = json['edges']!;
+    var edges = nodeList['edges']!;
     edges.forEach((element) {
       var fromNodeId = element['from'];
       var toNodeId = element['to'];
@@ -157,7 +167,7 @@ class _TreeViewPageState extends State<TreeViewPage> {
                 builder: (Node node) {
                   // I can decide what widget should be shown here based on the id
                   var a = node.key!.value as int?;
-                  var nodes = json['nodes']!;
+                  var nodes = nodeList['nodes']!;
                   var nodeValue =
                       nodes.firstWhere((element) => element['id'] == a);
                   return rectangleWidget(nodeValue['id'], nodeValue['label']);

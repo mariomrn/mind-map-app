@@ -60,7 +60,7 @@ class _NoduloState extends State<Nodulo> {
             isActive = true;
             // TODO: add all dependent nodes to the net
             //neue Söhne
-            createSon();
+            createSon(widget.nodeId);
           }
         });
       },
@@ -79,9 +79,9 @@ class _NoduloState extends State<Nodulo> {
           if (widget.nodeId! > 300 )
             TableNode(isSelected, selectedNode, setSelectedNode,
                 nodeId, myFocusNode),
-            isSelected?
-            NodeOptions(createSon, createBro, false)
-                : Column(),
+            // isSelected?
+            // NodeOptions(createSon, createBro, false)
+            //     : Column(),
           ]);
 
         },
